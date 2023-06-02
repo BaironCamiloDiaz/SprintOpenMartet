@@ -6,7 +6,7 @@ package co.unicauca.openmarket.client.presentation;
 
 import co.unicauca.openmarket.client.domain.Category;
 import co.unicauca.openmarket.client.domain.Product;
-import co.unicauca.openmarket.client.domain.service.ProductService;
+import co.unicauca.openmarket.client.domain.services.ProductService;
 import co.unicauca.openmarket.client.infra.Messages;
 import static co.unicauca.openmarket.client.infra.Messages.successMessage;
 import javax.swing.JOptionPane;
@@ -343,7 +343,7 @@ public class GUIProducts extends javax.swing.JFrame {
             Long id=Long.parseLong(this.txtId.getText());
             String name = txtName.getText().trim();
             String description = txtDescription.getText().trim();
-            Long categoryId=Long.parseLong(this.txtCategory.getText());
+            Long categoryId = Long.parseLong(this.txtCategory.getText());
             if (productService.saveProduct(id,name, description, categoryId)) {
                 Messages.showMessageDialog("Se grabó con éxito", "Atención");
                 cleanControls();

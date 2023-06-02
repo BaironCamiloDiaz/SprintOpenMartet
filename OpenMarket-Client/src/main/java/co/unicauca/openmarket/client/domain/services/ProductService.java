@@ -1,4 +1,4 @@
-package co.unicauca.openmarket.client.domain.service;
+package co.unicauca.openmarket.client.domain.services;
 
 
 
@@ -43,7 +43,7 @@ public class ProductService  {
         
         
         //Validate product
-        if (newProduct.getName().isBlank() ) {
+        if (newProduct.getName().isEmpty() ) {
             return false;
         }
 
@@ -87,7 +87,7 @@ public class ProductService  {
         producto.setDescription(description);
         producto.setCategoryId(categoryId);
         //Validate product
-        if (producto.getProductId() == null ||producto.getName().isBlank()) {
+        if (producto.getProductId() == null ||producto.getName().isEmpty()) {
             return false;
         }
         return repository.edit(producto);

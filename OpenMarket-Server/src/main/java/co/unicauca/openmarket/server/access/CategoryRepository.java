@@ -1,9 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package co.unicauca.openmarket.client.access;
+package co.unicauca.openmarket.server.access;
 
 import co.unicauca.openmarket.client.domain.Category;
 import java.sql.Connection;
@@ -25,6 +20,25 @@ public class CategoryRepository implements ICategoryRepository {
 
     public CategoryRepository() {
         initDatabase();
+        insertInit();
+    }
+    
+     private void insertInit() {
+        try {
+            String sql = "INSERT INTO categories (name) "
+                    + "VALUES ( ? )";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, "Entretenimiento");
+            pstmt.executeUpdate();
+            
+            sql = "INSERT INTO categories (name) "
+                    + "VALUES ( ? )";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, "Juguetería");
+            pstmt.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(ProductRepository.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override

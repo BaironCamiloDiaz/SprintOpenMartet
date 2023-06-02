@@ -1,6 +1,5 @@
-package co.unicauca.openmarket.client.access;
+package co.unicauca.openmarket.server.access;
 
-import co.unicauca.openmarket.client.domain.Category;
 import co.unicauca.openmarket.client.domain.Product;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,7 +9,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,24 +29,24 @@ public class ProductRepository implements IProductRepository {
 
     @Override
     public boolean save(Product newProduct) {
-
         try {
             //Validate product
             if (newProduct == null || newProduct.getName().isBlank()) {
                 return false;
             }
             //this.connect();
-
-            String sql = "INSERT INTO products ( productId, name, description, categoryId ) "
-                    + "VALUES ( ?, ?, ?, ? )";
-
+            String sql = "INSERT INTO products (name, description, price, state, stock, categoryId, locationId, userSellerId) "
+                    + "VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )";
             PreparedStatement pstmt = conn.prepareStatement(sql);
-             pstmt.setLong(1, newProduct.getProductId());
-            pstmt.setString(2, newProduct.getName());
-            pstmt.setString(3, newProduct.getDescription());
-            pstmt.setLong(4, newProduct.getCategoryId());
+            pstmt.setString(1, newProduct.getName());
+            pstmt.setString(2, newProduct.getDescription());
+            pstmt.setDouble(3, newProduct.getPrice());
+            pstmt.setString(4, newProduct.getState());
+            pstmt.setInt(5, newProduct.getStock());
+            pstmt.setLong(6, newProduct.getCategoryId());
+            pstmt.setLong(7, newProduct.getLocation());
+            pstmt.setLong(8, newProduct.getUserSellerId());
             pstmt.executeUpdate();
-            //this.disconnect();
             return true;
         } catch (SQLException ex) {
             Logger.getLogger(ProductRepository.class.getName()).log(Level.SEVERE, null, ex);
@@ -60,10 +58,7 @@ public class ProductRepository implements IProductRepository {
     public List<Product> findAll() {
         List<Product> products = new ArrayList<>();
         try {
-
             String sql = "SELECT * FROM products";
-            //this.connect();
-
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -71,10 +66,14 @@ public class ProductRepository implements IProductRepository {
                 newProduct.setProductId(rs.getLong("productId"));
                 newProduct.setName(rs.getString("name"));
                 newProduct.setDescription(rs.getString("description"));
-
+                newProduct.setPrice(rs.getDouble("price"));
+                newProduct.setState(rs.getString("state"));
+                newProduct.setStock(rs.getInt("stock"));
+                newProduct.setCategoryId(rs.getLong("categoryId"));
+                newProduct.setLocation(rs.getLong("locationId"));
+                newProduct.setUserSellerId(rs.getLong("userSellerId"));
                 products.add(newProduct);
             }
-            //this.disconnect();
 
         } catch (SQLException ex) {
             Logger.getLogger(ProductRepository.class.getName()).log(Level.SEVERE, null, ex);
@@ -85,11 +84,18 @@ public class ProductRepository implements IProductRepository {
     public void initDatabase() {
         // SQL statement for creating a new table
         String sql = "CREATE TABLE IF NOT EXISTS products (\n"
-                + "	productId integer PRIMARY KEY,\n"
+                + "	productId integer PRIMARY KEY AUTOINCREMENT,\n"
                 + "	name text NOT NULL,\n"
                 + "	description text NULL,\n"
+                + "     price real NOT NULL,\n"
+                + "     state text NULL,\n"
+                + "     stock integer NOT NULL,\n"
                 + "     categoryId integer,\n"
+                + "     locationId integer NULL,\n"
+                + "     userSellerId integer NULL,\n"
                 + "     FOREIGN KEY (categoryId) REFERENCES categories(categoryId)\n"
+                + "     FOREIGN KEY (locationId) REFERENCES location(locationId)\n"
+                + "     FOREIGN KEY (userSellerId) REFERENCES users(userId)\n"
                 + ");";
 
         try {
@@ -107,7 +113,7 @@ public class ProductRepository implements IProductRepository {
         // SQLite connection string
         //String url = "jdbc:sqlite:./myDatabase.db"; //Para Linux/Mac
         //String url = "jdbc:sqlite:C:/sqlite/db/myDatabase.db"; //Para Windows
-        String url = "jdbc:sqlite::memory:";
+        String url = "jdbc:sqlite::memory:market";
 
         try {
             conn = DriverManager.getConnection(url);
@@ -132,20 +138,25 @@ public class ProductRepository implements IProductRepository {
     public boolean edit(Product product) {
         try {
             //Validate product
-            if (product.getProductId()<= 0 || product == null) {
+            if (product == null) {
                 return false;
             }
             //this.connect();
 
-            String sql = "UPDATE  products "
-                    + "SET name=?, description=?, categoryId=? "
+            String sql = "UPDATE  products"
+                    + "SET name=?, description=?,price=?, state=?, stock=?, categoryId=?,locationId=?, userSellerId=?"
                     + "WHERE productId = ?";
 
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, product.getName());
             pstmt.setString(2, product.getDescription());
-            pstmt.setLong(3, product.getCategoryId());
-            pstmt.setLong(4, product.getProductId());
+            pstmt.setDouble(3, product.getPrice());
+            pstmt.setString(4, product.getState());
+            pstmt.setLong(5, product.getStock());
+            pstmt.setLong(6, product.getCategoryId());
+            pstmt.setLong(7, product.getLocation());
+            pstmt.setLong(8, product.getUserSellerId());
+            pstmt.setLong(9, product.getProductId());
             pstmt.executeUpdate();
             //this.disconnect();
             return true;
@@ -181,7 +192,6 @@ public class ProductRepository implements IProductRepository {
     @Override
     public Product findById(Long id) {
         try {
-
             String sql = "SELECT * FROM products  "
                     + "WHERE productId = ?";
 
@@ -195,11 +205,47 @@ public class ProductRepository implements IProductRepository {
                 prod.setProductId(res.getLong("productId"));
                 prod.setName(res.getString("name"));
                 prod.setDescription(res.getString("description"));
+                prod.setPrice(res.getDouble("price"));
+                prod.setStock(res.getInt("stock"));
+                prod.setCategoryId(res.getLong("categoryId"));
+                prod.setLocation(res.getLong("locationId"));
+                prod.setUserSellerId(res.getLong("userSellerId"));
                 return prod;
             } else {
                 return null;
             }
             //this.disconnect();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(ProductRepository.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    @Override
+    public List<Product> findAllByNameAndDescription(String search) {
+          List<Product> products = new ArrayList<>();
+        try {
+            String sql = "SELECT * FROM products  "
+                    + "WHERE name LIKE '%?%' OR description LIKE %?% ";
+
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, search);
+            pstmt.setString(2, search);
+
+            ResultSet res = pstmt.executeQuery();
+            while (res.next()) {
+                Product prod = new Product();
+                prod.setProductId(res.getLong("productId"));
+                prod.setName(res.getString("name"));
+                prod.setDescription(res.getString("description"));
+                prod.setPrice(res.getDouble("price"));
+                prod.setStock(res.getInt("stock"));
+                prod.setCategoryId(res.getLong("categoryId"));
+                prod.setLocation(res.getLong("locationId"));
+                prod.setUserSellerId(res.getLong("userSellerId"));
+                products.add(prod);
+            }
+            return products;
 
         } catch (SQLException ex) {
             Logger.getLogger(ProductRepository.class.getName()).log(Level.SEVERE, null, ex);

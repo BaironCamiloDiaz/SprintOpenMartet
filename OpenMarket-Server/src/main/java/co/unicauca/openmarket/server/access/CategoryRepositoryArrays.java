@@ -1,9 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package co.unicauca.openmarket.client.access;
+package co.unicauca.openmarket.server.access;
 
 import co.unicauca.openmarket.client.domain.Category;
 import java.util.ArrayList;
@@ -27,6 +22,7 @@ public class CategoryRepositoryArrays implements ICategoryRepository{
         category.add(new Category(10L, "lacteos"));
         category.add(new Category(11L, "granos"));
         category.add(new Category(12L, "mecato"));
+        category.add(new Category(13L, "peluchitos"));
         
 
     }

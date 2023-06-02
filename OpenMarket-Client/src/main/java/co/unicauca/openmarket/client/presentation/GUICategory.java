@@ -6,7 +6,7 @@
 package co.unicauca.openmarket.client.presentation;
 
 import co.unicauca.openmarket.client.domain.Category;
-import co.unicauca.openmarket.client.domain.service.CategoryService;
+import co.unicauca.openmarket.client.domain.services.CategoryService;
 import co.unicauca.openmarket.client.infra.Messages;
 import static co.unicauca.openmarket.client.infra.Messages.successMessage;
 import javax.swing.JOptionPane;

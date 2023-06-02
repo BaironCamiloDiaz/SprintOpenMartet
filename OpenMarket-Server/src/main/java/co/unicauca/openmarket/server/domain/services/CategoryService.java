@@ -1,11 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package co.unicauca.openmarket.domain.services;
+package co.unicauca.openmarket.server.domain.services;
 
-import co.unicauca.openmarket.client.access.ICategoryRepository;
+import co.unicauca.openmarket.server.access.ICategoryRepository;
 import co.unicauca.openmarket.client.domain.Category;
 import java.util.List;
 
@@ -13,7 +8,7 @@ import java.util.List;
 
 public class CategoryService {
      /**
-     * Repositorio de Productos
+     * Repositorio de Category
      */
      ICategoryRepository repo;
      /**

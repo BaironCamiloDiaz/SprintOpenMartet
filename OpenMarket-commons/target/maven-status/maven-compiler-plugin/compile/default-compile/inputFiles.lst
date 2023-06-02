@@ -1,6 +1,7 @@
-D:\Unicauca\Estilos de Arquitectura\Cliente-Servidor\Cliente-Servidor-Sockets\TravelAgency-commons\src\main\java\co\unicauca\travelagency\commons\infra\Utilities.java
-D:\Unicauca\Estilos de Arquitectura\Cliente-Servidor\Cliente-Servidor-Sockets\TravelAgency-commons\src\main\java\co\unicauca\travelagency\commons\infra\Protocol.java
-D:\Unicauca\Estilos de Arquitectura\Cliente-Servidor\Cliente-Servidor-Sockets\TravelAgency-commons\src\main\java\co\unicauca\travelagency\commons\domain\Customer.java
-D:\Unicauca\Estilos de Arquitectura\Cliente-Servidor\Cliente-Servidor-Sockets\TravelAgency-commons\src\main\java\co\unicauca\travelagency\commons\infra\Parameters.java
-D:\Unicauca\Estilos de Arquitectura\Cliente-Servidor\Cliente-Servidor-Sockets\TravelAgency-commons\src\main\java\co\unicauca\travelagency\commons\infra\Parameter.java
-D:\Unicauca\Estilos de Arquitectura\Cliente-Servidor\Cliente-Servidor-Sockets\TravelAgency-commons\src\main\java\co\unicauca\travelagency\commons\infra\JsonError.java
+D:\UNIVERSIDAD\openMarket\OpenMarket-commons\src\main\java\co\unicauca\openmarket\commons\infra\Utilities.java
+D:\UNIVERSIDAD\openMarket\OpenMarket-commons\src\main\java\co\unicauca\openmarket\commons\infra\Parameters.java
+D:\UNIVERSIDAD\openMarket\OpenMarket-commons\src\main\java\co\unicauca\openmarket\commons\domain\Category.java
+D:\UNIVERSIDAD\openMarket\OpenMarket-commons\src\main\java\co\unicauca\openmarket\commons\domain\Product.java
+D:\UNIVERSIDAD\openMarket\OpenMarket-commons\src\main\java\co\unicauca\openmarket\commons\infra\Parameter.java
+D:\UNIVERSIDAD\openMarket\OpenMarket-commons\src\main\java\co\unicauca\openmarket\commons\infra\Protocol.java
+D:\UNIVERSIDAD\openMarket\OpenMarket-commons\src\main\java\co\unicauca\openmarket\commons\infra\JsonError.java

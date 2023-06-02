@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package co.unicauca.openmarket.client.access;
+package co.unicauca.openmarket.server.access;
 
 import co.unicauca.openmarket.client.domain.Product;
 import java.util.ArrayList;
@@ -24,10 +24,10 @@ public class ProductRepositoryArrays implements IProductRepository{
     }
         
     public void inicializar(){
-        productos.add(new Product(1L,"Aceite","Producto fritador",10L));
-        productos.add(new Product(2L,"Salchichas","Marca perrito",10L));
-        productos.add(new Product(3L,"Spagueetii","Marca la muñeca",11L));
-        productos.add(new Product(4L,"Bianchi","Caramelo",12L));
+//        productos.add(new Product(1L,"Aceite","Producto fritador",10L));
+//        productos.add(new Product(2L,"Salchichas","Marca perrito",10L));
+//        productos.add(new Product(3L,"Spagueetii","Marca la muñeca",11L));
+//        productos.add(new Product(4L,"Bianchi","Caramelo",12L));
     }  
     @Override
     public boolean save(Product newProduct) {
@@ -73,6 +73,11 @@ public class ProductRepositoryArrays implements IProductRepository{
 
     @Override
     public List<Product> findAll() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<Product> findAllByNameAndDescription(String search) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

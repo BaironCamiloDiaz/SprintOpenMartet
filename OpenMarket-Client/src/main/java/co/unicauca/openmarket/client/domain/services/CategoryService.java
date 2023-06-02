@@ -1,5 +1,5 @@
 
-package co.unicauca.openmarket.client.domain.service;
+package co.unicauca.openmarket.client.domain.services;
 
 import co.unicauca.openmarket.client.access.ICategoryAccess;
 import co.unicauca.openmarket.client.domain.Category;
@@ -23,7 +23,7 @@ public class CategoryService {
         Category newCategory=new Category();
         newCategory.setCategoryId(id);
         newCategory.setName(name);
-        if(newCategory.getName().isBlank()){
+        if(newCategory.getName().isEmpty()){
             return false;
         }
         return repository.save(newCategory);
@@ -31,7 +31,7 @@ public class CategoryService {
     public boolean editCategory(Long categoryId,Category cat) {
         
         
-        if(cat==null || cat.getName().isBlank()){
+        if(cat==null || cat.getName().isEmpty()){
             return false;
         }
       

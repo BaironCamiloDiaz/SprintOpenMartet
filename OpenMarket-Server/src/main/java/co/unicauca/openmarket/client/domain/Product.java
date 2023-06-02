@@ -6,36 +6,29 @@ package co.unicauca.openmarket.client.domain;
  */
 public class Product {
 
-
     private Long productId;
-
     private String name;
-    
     private String description;
-    
-    private double price;
-    
+    private Double price;
+    private String state;
+    private Integer stock;
     private Long categoryId;
-    
-    private Location location;
-    
-    private User user;
+    private Long location;
+    private Long userSellerId;
 
-    public Product(Long productId, String name, String description, double price,Long categoryId) {
+    public Product() {
+    }
+
+    public Product(Long productId, String name, String description, Double price, String state, Integer stock, Long categoryId, Long location, Long userSellerId) {
         this.productId = productId;
         this.name = name;
         this.description = description;
         this.price = price;
-        this.categoryId=categoryId;
-    }
-      public Product(Long productId, String name, String description,Long categoryId) {
-        this.productId = productId;
-        this.name = name;
-        this.description = description;
-        this.categoryId=categoryId;
-    }
-
-    public Product() {
+        this.state = state;
+        this.stock = stock;
+        this.categoryId = categoryId;
+        this.location = location;
+        this.userSellerId = userSellerId;
     }
 
     public Long getProductId() {
@@ -62,12 +55,28 @@ public class Product {
         this.description = description;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
     }
 
     public Long getCategoryId() {
@@ -78,22 +87,21 @@ public class Product {
         this.categoryId = categoryId;
     }
 
-    public Location getLocation() {
+    public Long getLocation() {
         return location;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(Long location) {
         this.location = location;
     }
 
-    public User getUser() {
-        return user;
+    public Long getUserSellerId() {
+        return userSellerId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserSellerId(Long userSellerId) {
+        this.userSellerId = userSellerId;
     }
     
-
-
+    
 }

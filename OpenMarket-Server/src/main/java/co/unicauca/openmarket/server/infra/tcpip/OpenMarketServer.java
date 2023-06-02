@@ -1,13 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package co.unicauca.openmarket.server.infra.tcpip;
-import co.unicauca.openmarket.client.access.CategoryRepositoryArrays;
-import co.unicauca.openmarket.client.access.ProductRepositoryArrays;
-import co.unicauca.openmarket.domain.services.CategoryService;
-import co.unicauca.openmarket.domain.services.ProductService;
+import co.unicauca.openmarket.server.access.CategoryRepository;
+import co.unicauca.openmarket.server.access.CategoryRepositoryArrays;
+import co.unicauca.openmarket.server.access.ProductRepository;
+import co.unicauca.openmarket.server.access.ProductRepositoryArrays;
+import co.unicauca.openmarket.server.access.UserRepository;
+import co.unicauca.openmarket.server.domain.services.CategoryService;
+import co.unicauca.openmarket.server.domain.services.ProductService;
+import co.unicauca.openmarket.server.domain.services.UserService;
 import co.unicauca.strategyserver.infra.ServerSocketMultiThread;
 import java.util.Scanner; 
 
@@ -25,12 +24,16 @@ public class OpenMarketServer {
         ServerSocketMultiThread myServer = new ServerSocketMultiThread(port);
         OpenMarketHandler myHandler = new OpenMarketHandler();
        
-        myHandler.setService(new CategoryService(new CategoryRepositoryArrays()));
-       
-        myHandler.setServiceProduct(new ProductService(new ProductRepositoryArrays()));
-       
+        //servicio de categorias
+        myHandler.setService(new CategoryService(new CategoryRepository()));
+        //Servicio de productos
+        myHandler.setServiceProduct(new ProductService(new ProductRepository()));
+        //servicio de usuarios
+        myHandler.setServiceUser(new UserService(new UserRepository()));
+        //servicio de location
+        
+        
         myServer.setServerHandler(myHandler);
-      
         myServer.startServer();
     }
 }

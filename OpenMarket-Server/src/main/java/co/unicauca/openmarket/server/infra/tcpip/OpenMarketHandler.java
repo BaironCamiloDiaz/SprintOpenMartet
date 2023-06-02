@@ -1,23 +1,20 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package co.unicauca.openmarket.server.infra.tcpip;
 import co.unicauca.openmarket.client.domain.Category;
 import co.unicauca.openmarket.client.domain.Product;
+import co.unicauca.openmarket.client.domain.User;
 import co.unicauca.openmarket.commons.infra.Protocol;
-import co.unicauca.openmarket.domain.services.CategoryService;
+import co.unicauca.openmarket.server.domain.services.CategoryService;
 import co.unicauca.strategyserver.infra.ServerHandler;
 import co.unicauca.openmarket.commons.infra.JsonError;
-import co.unicauca.openmarket.domain.services.ProductService;
+import co.unicauca.openmarket.server.access.UserRepository;
+import co.unicauca.openmarket.server.domain.services.LocationService;
+import co.unicauca.openmarket.server.domain.services.ProductService;
+import co.unicauca.openmarket.server.domain.services.SellerIncomeService;
+import co.unicauca.openmarket.server.domain.services.ShoppingService;
+import co.unicauca.openmarket.server.domain.services.UserService;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
-
-
-
-
 
 public class OpenMarketHandler extends ServerHandler {
     /**
@@ -25,7 +22,12 @@ public class OpenMarketHandler extends ServerHandler {
      * servicio de producto
      */
     private static CategoryService service;
-     private static ProductService serviceProduc;
+    private static ProductService serviceProduc;
+    private static LocationService serviceLocation;
+    private static UserService serviceUser;
+    private static ShoppingService serviceShopping;
+    private static SellerIncomeService serviceSellerIncome;
+    
     public OpenMarketHandler() {
     }
 
@@ -40,7 +42,7 @@ public class OpenMarketHandler extends ServerHandler {
         protocolRequest = gson.fromJson(requestJson, Protocol.class);
         String response="";
         switch (protocolRequest.getResource()) {
-            case "category" -> {
+            case "category":
                 if (protocolRequest.getAction().equals("get")) {
                     // Consultar una categoria
                     response = processGetCategory(protocolRequest);
@@ -65,22 +67,36 @@ public class OpenMarketHandler extends ServerHandler {
                     response = processGetListCategory(protocolRequest);
                 }
                 break;
-            }
-            case"product"->{
+                
+            case "product":
                 if (protocolRequest.getAction().equals("get")) {
-                    // Consultar un producto por ide
+                    // Consultar un producto por id
                     response = processGetProduct(protocolRequest);
                 }
                 if (protocolRequest.getAction().equals("post")) {
                     // Agregar un nuevo producto  
                     response = processPostProduct(protocolRequest);
                 }
-                 if (protocolRequest.getAction().equals("edit")){
+                if (protocolRequest.getAction().equals("edit")){
                     // Editar un producto
                     response = processEditproduct(protocolRequest);
                 }
+                if (protocolRequest.getAction().equals("findAll")){
+                    // listar productos
+                    response = processfinAllproduct();
+                }
+                if (protocolRequest.getAction().equals("findAllBySearch")){
+                    // Busqueda por nombre y descripcion en productos
+                    response = processfindAllByNameAndDescription(protocolRequest);
+                }
                 break;
-             }
+            case "user":
+                if (protocolRequest.getAction().equals("login")){
+                    // autenticacion
+                    response = processLoginUser(protocolRequest);
+                }
+                
+                break;
         }
         return response;
     }
@@ -91,7 +107,7 @@ public class OpenMarketHandler extends ServerHandler {
      * @param protocolRequest Protocolo de la solicitud
      */
     private String processGetCategory(Protocol protocolRequest) {
-        // Extraer la cedula del primer parámetro
+        // Extraer el id del primer parámetro
         Long id = Long.parseLong(protocolRequest.getParameters().get(0).getValue()) ;
         Category category = service.findById(id);
         if (category == null) {
@@ -116,7 +132,6 @@ public class OpenMarketHandler extends ServerHandler {
         String respuesta=String.valueOf(response);
         return respuesta;
     }
-    
      // Editar el name de la categoria
     private String processEditCategory(Protocol protocolRequest){
       
@@ -135,10 +150,8 @@ public class OpenMarketHandler extends ServerHandler {
        String respuesta=String.valueOf(response);
        return respuesta;
     }
-    
     // Lista de todas las categorias
     private String processListCategory(){
-       
        List<Category> category;
        category = service.findAll();
        return objectToJSON(category);
@@ -151,9 +164,13 @@ public class OpenMarketHandler extends ServerHandler {
     }
     
     
-    
-     private String processGetProduct(Protocol protocolRequest) {
-        // Extraer la cedula del primer parámetro
+    /**
+     * Controlador que invoca el servicio de buscar por id Product
+     * @param protocolRequest
+     * @return 
+     */
+    private String processGetProduct(Protocol protocolRequest) {
+        // Extraer el id del primer parámetro
         Long id = Long.parseLong(protocolRequest.getParameters().get(0).getValue()) ;
         Product producto = serviceProduc.findById(id);
         if (producto == null) {
@@ -163,31 +180,85 @@ public class OpenMarketHandler extends ServerHandler {
             return objectToJSON(producto);
         }
     }
+    /**
+     * Controlador que invoca el servicio de guargar producto
+     * @param protocolRequest
+     * @return 
+     */
     private String processPostProduct(Protocol protocolRequest) {
-        Product producto=new Product();
-        // Reconstruir La categoria a partir de lo que viene en los parámetros
+        
+        Product producto = new Product();
+        // Reconstruir el prodcucto  a partir de lo que viene en los parámetros
         producto.setProductId(Long.parseLong(protocolRequest.getParameters().get(0).getValue()));
         producto.setName(protocolRequest.getParameters().get(1).getValue());
         producto.setDescription(protocolRequest.getParameters().get(2).getValue());
-        producto.setCategoryId(Long.parseLong(protocolRequest.getParameters().get(3).getValue()));
+        producto.setPrice(Double.parseDouble(protocolRequest.getParameters().get(3).getValue()));
+        producto.setState(protocolRequest.getParameters().get(4).getValue());
+        producto.setStock(Integer.parseInt(protocolRequest.getParameters().get(5).getValue()));
+        producto.setCategoryId(Long.parseLong(protocolRequest.getParameters().get(6).getValue()));
+        producto.setLocation(Long.parseLong(protocolRequest.getParameters().get(7).getValue()));
+        producto.setUserSellerId(Long.parseLong(protocolRequest.getParameters().get(8).getValue()));
         
         boolean response = this.getServiceProduc().save(producto);
         String respuesta=String.valueOf(response);
         return respuesta;
     }
-    
+    /**
+     * Controlador que invoca el servicio de editar un producto (PUT)
+     * @param protocolRequest
+     * @return 
+     */
     private String processEditproduct(Protocol protocolRequest){
-        Product producto=new Product();
+       
+        Product producto = new Product();
+        
         producto.setProductId( Long.parseLong(protocolRequest.getParameters().get(0).getValue()));
-        producto.setName( protocolRequest.getParameters().get(1).getValue());
+        producto.setName(protocolRequest.getParameters().get(1).getValue());
         producto.setDescription(protocolRequest.getParameters().get(2).getValue());
-        producto.setCategoryId(Long.parseLong(protocolRequest.getParameters().get(0).getValue()));
+        producto.setPrice(Double.parseDouble(protocolRequest.getParameters().get(3).getValue()));
+        producto.setState(protocolRequest.getParameters().get(4).getValue());
+        producto.setStock(Integer.parseInt(protocolRequest.getParameters().get(5).getValue()));
+        producto.setCategoryId(Long.parseLong(protocolRequest.getParameters().get(6).getValue()));
+        producto.setLocation(Long.parseLong(protocolRequest.getParameters().get(7).getValue()));
+        producto.setUserSellerId(Long.parseLong(protocolRequest.getParameters().get(8).getValue()));
        
         boolean response = serviceProduc.edit(producto);
         String respuesta=String.valueOf(response);
         return respuesta;
     }
-    
+    /**
+     * Controlador que invoca el servicio de listar todos los productos
+     * @param protocolRequest
+     * @return 
+     */
+    private String processfinAllproduct(){
+        List<Product> products;
+        products = serviceProduc.findAll();
+       return objectToJSON(products);
+    }
+    /**
+     * Controlador que invoca el servicio de buscar productos por descripcion y nombre
+     * @param protocolRequest
+     * @return 
+     */
+    private String processfindAllByNameAndDescription(Protocol protocolRequest){
+        String search = protocolRequest.getParameters().get(0).getValue();
+        List<Product> products;
+        products = serviceProduc.findAllByNameAndDescription(search);
+        return objectToJSON(products);
+    }
+    /**
+     * Controlador que invoca el servicio de login
+     * @param protocolRequest
+     * @return 
+     */
+    private String processLoginUser(Protocol protocolRequest){
+        String username =  protocolRequest.getParameters().get(0).getValue();
+        String password =  protocolRequest.getParameters().get(1).getValue();
+        User user = new User();
+        user = serviceUser.findByUsernameAndPassword(username, password);
+      return "";
+    }
     /**
      * Genera un ErrorJson de cliente no encontrado
      *
@@ -225,6 +296,40 @@ public class OpenMarketHandler extends ServerHandler {
     public void setService(CategoryService service) {
         this.service = service;
     } 
+
+    public LocationService getServiceLocation() {
+        return serviceLocation;
+    }
+
+    public void setServiceLocation(LocationService serviceLocation) {
+        this.serviceLocation = serviceLocation;
+    }
+
+    public UserService getServiceUser() {
+        return serviceUser;
+    }
+
+    public void setServiceUser(UserService serviceUser) {
+        this.serviceUser = serviceUser;
+    }
+
+    public ShoppingService getServiceShopping() {
+        return serviceShopping;
+    }
+
+    public void setServiceShopping(ShoppingService serviceShopping) {
+        this.serviceShopping = serviceShopping;
+    }
+
+    public SellerIncomeService getServiceSellerIncome() {
+        return serviceSellerIncome;
+    }
+
+    public void setServiceSellerIncome(SellerIncomeService serviceSellerIncome) {
+        this.serviceSellerIncome = serviceSellerIncome;
+    }
+    
+    
     
    
 }

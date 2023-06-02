@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package co.unicauca.openmarket.domain.services;
+package co.unicauca.openmarket.server.domain.services;
 
-import co.unicauca.openmarket.client.access.IProductRepository;
+import co.unicauca.openmarket.server.access.IProductRepository;
 import co.unicauca.openmarket.client.domain.Product;
 import java.util.List;
 
@@ -45,4 +45,10 @@ public class ProductService {
     public synchronized List<Product> findByName(String name){
         return repo.findByName(name);
     };
+    public synchronized List<Product> findAllByNameAndDescription(String search){
+        return repo.findAllByNameAndDescription(search);
+    }
+    public synchronized List<Product> findByCategory(String categoryName){
+        return repo.findByCategory(categoryName);
+    }
 }
