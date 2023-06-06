@@ -1,10 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package co.unicauca.openmarket.client.access;
-
 
 import co.unicauca.openmarket.client.domain.Category;
 import co.unicauca.openmarket.client.infra.OpenMarketSocket;
@@ -16,11 +10,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.gson.Gson;
 import java.io.IOException;
 
-
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 
 /**
  *

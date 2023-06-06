@@ -22,7 +22,6 @@ public class CategoryRepositoryArrays implements ICategoryRepository{
         category.add(new Category(10L, "lacteos"));
         category.add(new Category(11L, "granos"));
         category.add(new Category(12L, "mecato"));
-        category.add(new Category(13L, "peluchitos"));
         
 
     }

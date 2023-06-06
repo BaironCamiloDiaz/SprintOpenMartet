@@ -1,15 +1,19 @@
 package co.unicauca.openmarket.server.infra.tcpip;
 import co.unicauca.openmarket.server.access.CategoryRepository;
-import co.unicauca.openmarket.server.access.CategoryRepositoryArrays;
+import co.unicauca.openmarket.server.access.LocationRepository;
 import co.unicauca.openmarket.server.access.ProductRepository;
-import co.unicauca.openmarket.server.access.ProductRepositoryArrays;
+import co.unicauca.openmarket.server.access.SellerIncomeRepository;
+import co.unicauca.openmarket.server.access.ShoppingRepository;
 import co.unicauca.openmarket.server.access.UserRepository;
 import co.unicauca.openmarket.server.domain.services.CategoryService;
+import co.unicauca.openmarket.server.domain.services.LocationService;
 import co.unicauca.openmarket.server.domain.services.ProductService;
+import co.unicauca.openmarket.server.domain.services.SellerIncomeService;
+import co.unicauca.openmarket.server.domain.services.ShoppingService;
 import co.unicauca.openmarket.server.domain.services.UserService;
 import co.unicauca.strategyserver.infra.ServerSocketMultiThread;
-import java.util.Scanner; 
-
+import java.util.Scanner;  
+       
 
 public class OpenMarketServer {
      /**
@@ -31,7 +35,11 @@ public class OpenMarketServer {
         //servicio de usuarios
         myHandler.setServiceUser(new UserService(new UserRepository()));
         //servicio de location
-        
+        myHandler.setServiceLocation(new LocationService(new LocationRepository()));
+        //servicio de Shopping
+        myHandler.setServiceShopping(new ShoppingService(new ShoppingRepository()));
+        //servicio de SellerIncome
+        myHandler.setServiceSellerIncome(new SellerIncomeService(new SellerIncomeRepository()));
         
         myServer.setServerHandler(myHandler);
         myServer.startServer();

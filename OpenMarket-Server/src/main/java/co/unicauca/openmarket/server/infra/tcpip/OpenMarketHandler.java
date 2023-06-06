@@ -1,12 +1,14 @@
 package co.unicauca.openmarket.server.infra.tcpip;
 import co.unicauca.openmarket.client.domain.Category;
+import co.unicauca.openmarket.client.domain.Location;
 import co.unicauca.openmarket.client.domain.Product;
+import co.unicauca.openmarket.client.domain.SellerIncome;
+import co.unicauca.openmarket.client.domain.Shopping;
 import co.unicauca.openmarket.client.domain.User;
 import co.unicauca.openmarket.commons.infra.Protocol;
 import co.unicauca.openmarket.server.domain.services.CategoryService;
 import co.unicauca.strategyserver.infra.ServerHandler;
 import co.unicauca.openmarket.commons.infra.JsonError;
-import co.unicauca.openmarket.server.access.UserRepository;
 import co.unicauca.openmarket.server.domain.services.LocationService;
 import co.unicauca.openmarket.server.domain.services.ProductService;
 import co.unicauca.openmarket.server.domain.services.SellerIncomeService;
@@ -15,7 +17,7 @@ import co.unicauca.openmarket.server.domain.services.UserService;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
-
+    
 public class OpenMarketHandler extends ServerHandler {
     /**
      * Servicio de categoria
@@ -81,6 +83,10 @@ public class OpenMarketHandler extends ServerHandler {
                     // Editar un producto
                     response = processEditproduct(protocolRequest);
                 }
+                if (protocolRequest.getAction().equals("delete")){
+                    // Eliminar un producto
+                    response = processDeleteProduct(protocolRequest);
+                }
                 if (protocolRequest.getAction().equals("findAll")){
                     // listar productos
                     response = processfinAllproduct();
@@ -89,13 +95,55 @@ public class OpenMarketHandler extends ServerHandler {
                     // Busqueda por nombre y descripcion en productos
                     response = processfindAllByNameAndDescription(protocolRequest);
                 }
+                if (protocolRequest.getAction().equals("findAllByUserSeller")){
+                    // Busqueda por nombre y descripcion en productos
+                    response = processfindAllByUserSeller(protocolRequest);
+                }
                 break;
             case "user":
                 if (protocolRequest.getAction().equals("login")){
                     // autenticacion
                     response = processLoginUser(protocolRequest);
                 }
+                if (protocolRequest.getAction().equals("findById")){
+                    // autenticacion
+                    response = processFindByIdUser(protocolRequest);
+                }
+                if (protocolRequest.getAction().equals("editScore")){
+                    // listar compras
+                    response = processScoreSeller(protocolRequest);
+                }
+                break;
+            case "shopping":
+                if (protocolRequest.getAction().equals("post")){
+                    // crear una compra
+                    response = processSaveShopping(protocolRequest);
+                }
+                if (protocolRequest.getAction().equals("findAllShopping")){
+                    // listar compras
+                    response = processFindAllShopping();
+                }
+                if (protocolRequest.getAction().equals("findByProductId")){
+                    System.out.println("SI ENTRO DONDE ERA");
+                    response = processFindByProductIdShopping(protocolRequest);
+                }
                 
+                break;
+            case "sellerIncome":
+                if (protocolRequest.getAction().equals("post")){
+                    // guargar ganancias
+                    response = processSaveSellerIncome(protocolRequest);
+                }
+                if (protocolRequest.getAction().equals("findAllSellerIncome")){
+                    // listar ganancias
+                    response = processFindAllSellerIncome();
+                }
+                break;
+            case "location":
+                if (protocolRequest.getAction().equals("findAllLocation")){
+                    // listar ubicaciones
+                    response = processFindAllLocation();
+                }
                 break;
         }
         return response;
@@ -180,6 +228,30 @@ public class OpenMarketHandler extends ServerHandler {
             return objectToJSON(producto);
         }
     }
+    
+    private String processFindByProductIdShopping(Protocol protocolRequest){
+        Long productId = Long.parseLong(protocolRequest.getParameters().get(0).getValue()) ;
+        System.out.println("QUE LLEGA AL PRODUCT ID: "+productId);
+        Shopping shopping = serviceShopping.findByProductId(productId);
+        if (shopping == null) {
+            String errorJson = generateNotFoundErrorJson();
+            return errorJson;
+        } else {
+            return objectToJSON(shopping);
+        }
+    }
+    
+    private String processFindByIdUser(Protocol protocolRequest){
+        Long UserId = Long.parseLong(protocolRequest.getParameters().get(0).getValue()) ;
+        System.out.println("QUE LLEGA AL USER ID: "+UserId);
+        User user = serviceUser.findById(UserId);
+        if (user == null) {
+            String errorJson = generateNotFoundErrorJson();
+            return errorJson;
+        } else {
+            return objectToJSON(user);
+        }
+    }
     /**
      * Controlador que invoca el servicio de guargar producto
      * @param protocolRequest
@@ -189,15 +261,16 @@ public class OpenMarketHandler extends ServerHandler {
         
         Product producto = new Product();
         // Reconstruir el prodcucto  a partir de lo que viene en los parámetros
-        producto.setProductId(Long.parseLong(protocolRequest.getParameters().get(0).getValue()));
-        producto.setName(protocolRequest.getParameters().get(1).getValue());
-        producto.setDescription(protocolRequest.getParameters().get(2).getValue());
-        producto.setPrice(Double.parseDouble(protocolRequest.getParameters().get(3).getValue()));
-        producto.setState(protocolRequest.getParameters().get(4).getValue());
-        producto.setStock(Integer.parseInt(protocolRequest.getParameters().get(5).getValue()));
-        producto.setCategoryId(Long.parseLong(protocolRequest.getParameters().get(6).getValue()));
-        producto.setLocation(Long.parseLong(protocolRequest.getParameters().get(7).getValue()));
-        producto.setUserSellerId(Long.parseLong(protocolRequest.getParameters().get(8).getValue()));
+        //producto.setProductId(Long.parseLong(protocolRequest.getParameters().get(0).getValue()));
+        producto.setName(protocolRequest.getParameters().get(0).getValue());
+        producto.setDescription(protocolRequest.getParameters().get(1).getValue());
+        producto.setPrice(Double.parseDouble(protocolRequest.getParameters().get(2).getValue()));
+        System.out.println("PRUEBAAAA: "+protocolRequest.getParameters().get(3).getValue());
+        producto.setState(protocolRequest.getParameters().get(3).getValue());
+        producto.setStock(Integer.parseInt(protocolRequest.getParameters().get(4).getValue()));
+        producto.setCategoryId(Long.parseLong(protocolRequest.getParameters().get(5).getValue()));
+        producto.setLocation(Long.parseLong(protocolRequest.getParameters().get(6).getValue()));
+        producto.setUserSellerId(Long.parseLong(protocolRequest.getParameters().get(7).getValue()));
         
         boolean response = this.getServiceProduc().save(producto);
         String respuesta=String.valueOf(response);
@@ -241,11 +314,30 @@ public class OpenMarketHandler extends ServerHandler {
      * @param protocolRequest
      * @return 
      */
-    private String processfindAllByNameAndDescription(Protocol protocolRequest){
+    private String processfindAllByNameAndDescription(Protocol protocolRequest) {
         String search = protocolRequest.getParameters().get(0).getValue();
         List<Product> products;
         products = serviceProduc.findAllByNameAndDescription(search);
         return objectToJSON(products);
+    }
+    
+    private String processfindAllByUserSeller(Protocol protocolRequest){
+        Long userSellerId = Long.parseLong(protocolRequest.getParameters().get(0).getValue());
+        List<Product> products;
+        products = serviceProduc.findByUserSeller(userSellerId);
+        return objectToJSON(products);
+    }
+    
+    /**
+     * Controlador que invoca el servicio de eliminar producto por Id
+     * @param protocolRequest
+     * @return 
+     */
+    private String processDeleteProduct(Protocol protocolRequest){
+        Long id = Long.parseLong(protocolRequest.getParameters().get(0).getValue());
+       boolean response = serviceProduc.delete(id);
+       String respuesta=String.valueOf(response);
+       return respuesta;
     }
     /**
      * Controlador que invoca el servicio de login
@@ -257,8 +349,74 @@ public class OpenMarketHandler extends ServerHandler {
         String password =  protocolRequest.getParameters().get(1).getValue();
         User user = new User();
         user = serviceUser.findByUsernameAndPassword(username, password);
-      return "";
+      return objectToJSON(user);
     }
+    private String processScoreSeller(Protocol protocolRequest){
+        
+        User user = new User();
+        
+        user.setUserId(Long.parseLong(protocolRequest.getParameters().get(0).getValue()));
+        user.setScore(Float.parseFloat(protocolRequest.getParameters().get(1).getValue()));
+        boolean response = serviceUser.edit(user);
+        String respuesta=String.valueOf(response);
+        return respuesta;
+    }
+    /**
+     * Controlador que invoca el servicio de guardar la compra 
+     * @param protocolRequest json con la información a guardar.
+     * @return String cadena con la información de la comprar a guardar. 
+     */
+    private String processSaveShopping(Protocol protocolRequest){
+        Shopping shopping = new Shopping();
+        // Reconstruir el prodcucto  a partir de lo que viene en los parámetros
+     //   shopping.setShoppingId(Long.parseLong(protocolRequest.getParameters().get(0).getValue()));
+        shopping.setUserBuyerId(Long.parseLong(protocolRequest.getParameters().get(0).getValue()));
+        shopping.setProductId(Long.parseLong(protocolRequest.getParameters().get(1).getValue()));
+        
+        boolean response = serviceShopping.save(shopping);
+        String respuesta = String.valueOf(response);
+        return respuesta;
+    }
+    /**
+     * Controllador que invoca el servicio de listar todos las compras
+     * @return 
+     */
+    private String processFindAllShopping(){
+        List<Shopping> shoppings;
+        shoppings = serviceShopping.findAll();
+       return objectToJSON(shoppings);
+    }
+    /**
+     * Controllador que invoca el servicio de guardar las ganancias
+     * @return 
+     */
+    private String processSaveSellerIncome(Protocol protocolRequest){
+        SellerIncome seller = new SellerIncome();
+        // Reconstruir el prodcucto  a partir de lo que viene en los parámetros
+        //seller.setSellerIncomeId(Long.parseLong(protocolRequest.getParameters().get(0).getValue()));
+        seller.setIncome(Double.parseDouble(protocolRequest.getParameters().get(0).getValue()));
+        seller.setShoppingId(Long.parseLong(protocolRequest.getParameters().get(1).getValue()));
+        
+        boolean response = serviceSellerIncome.save(seller);
+        String respuesta = String.valueOf(response);
+        return respuesta;
+    }
+    /**
+     * Controllador que invoca el servicio de listar todos las ganancias
+     * @return 
+     */
+    private String processFindAllSellerIncome(){
+        List<SellerIncome> sellers;
+        sellers = serviceSellerIncome.findAll();
+       return objectToJSON(sellers);
+    }
+    
+    private String processFindAllLocation(){
+        List<Location> locations;
+        locations = serviceLocation.findAll();
+       return objectToJSON(locations);
+    }
+    
     /**
      * Genera un ErrorJson de cliente no encontrado
      *
